@@ -42,11 +42,16 @@ velocityX = 0
 velocityY = 0
 game_over = False
 score = 0
+paused = False
 
 def change_direction(e): #e = event
     #print(e)
     #print(e.keysym)
     global velocityX, velocityY, game_over
+
+    if e.keysym == "r" or e.keysym == "R":
+        restart()
+        return
 
     if (game_over):
         return
@@ -63,14 +68,21 @@ def change_direction(e): #e = event
     elif (e.keysym == "Left" and velocityX != 1):
         velocityX = -1
         velocityY = 0
-    elif (e.keysym == "r" or e.keysym == "R"):
-        restart()
+    elif e.keysym == "space":
+        pause()
         return
-    
+
+def pause():
+    global snake, food, snake_body, game_over, score, paused
+
+    paused = not paused  # Toggle True/False
+
+
+
 def move():
     global snake, food, snake_body, game_over, score
 
-    if (game_over):
+    if paused or game_over:
         return
     
     if (snake.x < 0 or snake.x >= WINDOW_WIDTH or snake.y < 0 or snake.y >= WINDOW_HEIGHT):
@@ -118,15 +130,22 @@ def draw():
 
     #draw snake
     canvas.create_rectangle(snake.x, snake.y, snake.x + TILE_SIZE, snake.y + TILE_SIZE,
-                            fill = "blue")
+                            fill = "lime green")
     
+
     for tile in snake_body:
-        canvas.create_rectangle(tile.x, tile.y, tile.x + TILE_SIZE, tile.y + TILE_SIZE, fill = "blue")
+        canvas.create_rectangle(tile.x, tile.y, tile.x + TILE_SIZE, tile.y + TILE_SIZE, fill = "lime green")
     
     if (game_over):
-        canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font= "Arial 20", text= f"Game Over: {score}", fill = "White")
+        canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font= "Arial 20", text= f"Game Over: {score}", fill = "Yellow")
+        canvas.create_text(555,20, font = "Arial 10", text= "Restart:[R]", fill = "Yellow")
     else:
         canvas.create_text(30,20,font = "Arial 10", text = f"Score:  {score}", fill = "white")
+        canvas.create_text(570,20, font = "Arial 10", text= "Paused:[Space]", fill = "white")
+        canvas.create_text(555,40, font = "Arial 10", text= "Restart:[R]", fill = "white")
+
+    if paused:
+        canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font="Arial 20", text="PAUSED", fill="white")
 
 
     window.after(100,draw) #100ms = 1/10 second, 10 frames/second
